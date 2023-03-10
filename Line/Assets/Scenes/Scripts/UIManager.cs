@@ -21,7 +21,6 @@ public class UIManager : MonoBehaviour
     }
     public void UpdateYourScore(float _score)
     {
-        print(_score);
         score.text = String.Format("{0,6:000000}", _score) ;
     }
     public void UpdateHighScore(float _highScore)
