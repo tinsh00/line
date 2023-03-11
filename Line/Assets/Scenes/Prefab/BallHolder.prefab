@@ -12,9 +12,10 @@ GameObject:
   - component: {fileID: 6566457082525565592}
   - component: {fileID: 6566457082525565593}
   - component: {fileID: 5079902671294872652}
+  - component: {fileID: -2797103460249330374}
   m_Layer: 0
   m_Name: BallHolder
-  m_TagString: Untagged
+  m_TagString: BallHolder
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -95,6 +96,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: aae3bbdc8f19cbc4dacbd5733577e8e1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  currentBall: {fileID: 0}
+--- !u!65 &-2797103460249330374
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6566457082525565588}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 1, y: 1.1743103, z: 1}
+  m_Center: {x: 0, y: 0.08715514, z: 0}
 --- !u!1 &6566457082892078041
 GameObject:
   m_ObjectHideFlags: 0
@@ -106,7 +121,6 @@ GameObject:
   - component: {fileID: 6566457082892078040}
   - component: {fileID: 6566457082892078045}
   - component: {fileID: 6566457082892078042}
-  - component: {fileID: 6566457082892078043}
   m_Layer: 0
   m_Name: Cube
   m_TagString: Untagged
@@ -122,7 +136,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6566457082892078041}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.57, z: 0}
+  m_LocalPosition: {x: 0, y: 0.52, z: 0}
   m_LocalScale: {x: 0.9, y: 0.2, z: 0.9}
   m_Children: []
   m_Father: {fileID: 6566457082525565591}
@@ -177,16 +191,3 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!65 &6566457082892078043
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6566457082892078041}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
