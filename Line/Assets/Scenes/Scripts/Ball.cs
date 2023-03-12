@@ -29,15 +29,17 @@ public class Ball : MonoBehaviour
         mesh.material = GameData.Instance.materials[(int)type];
     }
     public Material GetMaterial() => mesh.material;
-    public void SetPosition(int x,int y)
+    public void SetPosition(Vector2 position)
 	{
-        gameObject.transform.position = new Vector3(x, gameObject.transform.position.y, y);
+        gameObject.transform.position = new Vector3(position.x, gameObject.transform.position.y, position.y);
 	}
     public BallType GetBallType() => type;
     public void MoveBallFrom(BallHolder currentBallHolder, BallHolder fromBallHolder = null)
 	{
+        
         SetCurrnetBallHolder(currentBallHolder);
-        currentBallHolder.SetCurrentBall(this);
+        currentBallHolder.SetHoldBall();
+        SetPosition(currentBallHolder.GetPosition());
         if (!fromBallHolder) return;
         SetFromBallHolder(fromBallHolder);
         fromBallHolder.ReleaseBall();

@@ -5,8 +5,8 @@ using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
-    private int width=10;
-    private int height=10;
+    private int width = 10;
+    private int height = 10;
     [SerializeField] UIManager UIManager;
 
     [SerializeField] Transform holderTrans;
@@ -24,6 +24,8 @@ public class GameManager : MonoBehaviour
     [Header("gameplay")]
     public bool isChoose = false;
     Ball currentBall;
+
+    List<Vector2> listDirection = new List<Vector2>() { new Vector2(1, 0), new Vector2(0, 1), new Vector2(-1, 0), new Vector2(0, -1) };
     // Start is called before the first frame update
     void Start()
     {
@@ -111,6 +113,67 @@ public class GameManager : MonoBehaviour
             listBallPrediction[i].SetColor((BallType)type);
         }
     }
+    public int GetMinIValue(int value1, int value2)
+	{
+        if (value1 <= value2) return value1;
+        return value2;
+	}
+    BallHolder FindBallHolderByVectorPosition(Vector2 vector)
+	{
+        return listBallHolder.Find(x => x.GetPosition() == vector);
+	}
+    int BFS(Vector2 from, Vector2 to)
+	{
+        print(from + " " + to);
+        if (to == from) return 0;
+        int cost = 0;
+        Queue<BallHolder> qList = new Queue<BallHolder>();
+        //setup map
+        foreach (BallHolder item in listBallHolder)
+		{
+            item.SetStartStatus();
+		}
+        //start at vector from
+        BallHolder holder = FindBallHolderByVectorPosition(from);
+        holder.SetStatus(1);
+        //add in queue
+        qList.Enqueue(holder);
+        print(" count list :"+qList.Count);
+
+        while (!(qList.Count == 0))
+		{ 
+            BallHolder frontHolder = qList.Dequeue();
+            //tim dinh ke tiep : add 4 driction
+            print("count "+ qList.Count);
+            foreach(Vector2 item in listDirection)
+			{
+                Vector2 newVector = frontHolder.GetPosition() + item;
+                print(newVector);
+                BallHolder newBallHolder = FindBallHolderByVectorPosition(newVector);
+                print(newBallHolder);
+
+                if (newBallHolder != null && newBallHolder.CanMoveOver()&&newBallHolder.GetParentNode()!=frontHolder)
+				{
+                    int newCost = newBallHolder.CheckToInCreateCost(frontHolder);
+                    print(" new cost" + newCost +"cost: "+ cost);
+                    if (newVector == to)
+                    {
+                        if (cost == 0)
+                            cost = newCost;
+                        else
+                            cost = GetMinIValue(cost, newCost);
+                    }
+					if (cost!=0 && newCost < cost)
+					{
+                        qList.Enqueue(newBallHolder);
+					}
+                }			
+            }
+            frontHolder.SetStatus(2);//set da di qua 4 diem
+
+        }
+        return cost;
+	}
     //===================================Update==================================
     private void Update()
     {
@@ -143,7 +206,9 @@ public class GameManager : MonoBehaviour
 					{
 						BallHolder holder = hit.transform.GetComponent<BallHolder>();
 						if (!holder.CanHoldBall()) return;
-						currentBall.MoveBallFrom(holder, currentBall.currentBallHolder);
+                        print("co duong di khong : "+ BFS(currentBall.currentBallHolder.GetPosition(), holder.GetPosition()));
+
+                        currentBall.MoveBallFrom(holder, currentBall.currentBallHolder);
 					}
 				}
 			}
