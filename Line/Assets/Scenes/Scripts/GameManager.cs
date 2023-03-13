@@ -150,12 +150,13 @@ public class GameManager : MonoBehaviour
                 Vector2 newVector = frontHolder.GetPosition() + item;
                 print(newVector);
                 BallHolder newBallHolder = FindBallHolderByVectorPosition(newVector);
-                print(newBallHolder);
 
                 if (newBallHolder != null && newBallHolder.CanMoveOver()&&newBallHolder.GetParentNode()!=frontHolder)
 				{
                     int newCost = newBallHolder.CheckToInCreateCost(frontHolder);
-                    print(" new cost" + newCost +"cost: "+ cost);
+                    print("new cost " + newBallHolder.GetCost());
+
+                    //print(" new cost" + newCost +"cost: "+ cost);
                     if (newVector == to)
                     {
                         if (cost == 0)
@@ -163,8 +164,9 @@ public class GameManager : MonoBehaviour
                         else
                             cost = GetMinIValue(cost, newCost);
                     }
-					if (cost!=0 && newCost < cost)
+					if (cost==0 || newCost <= cost)
 					{
+                        print("add");
                         qList.Enqueue(newBallHolder);
 					}
                 }			
