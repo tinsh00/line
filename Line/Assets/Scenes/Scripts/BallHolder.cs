@@ -23,14 +23,14 @@ public class BallHolder : MonoBehaviour
 		{
             SetStatus(1);
             cost = value;
-            SetParentNode(parentHolder);
+            SetParentNode(parrentHolder);
             return cost;
 		}
         if(cost < value)
 		{
             return cost;
         }
-        SetParentNode(parentHolder);
+        SetParentNode(parrentHolder);
         return cost = value;
     }
     public int GetCost() => cost;

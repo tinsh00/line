@@ -24,7 +24,9 @@ public class GameManager : MonoBehaviour
     [Header("gameplay")]
     public bool isChoose = false;
     Ball currentBall;
-
+    [SerializeField] LineController lineController;
+    List<Vector3> listPointLine;
+    BallHolder currentHolder;
     List<Vector2> listDirection = new List<Vector2>() { new Vector2(1, 0), new Vector2(0, 1), new Vector2(-1, 0), new Vector2(0, -1) };
     // Start is called before the first frame update
     void Start()
@@ -138,25 +140,20 @@ public class GameManager : MonoBehaviour
         holder.SetStatus(1);
         //add in queue
         qList.Enqueue(holder);
-        print(" count list :"+qList.Count);
 
         while (!(qList.Count == 0))
 		{ 
             BallHolder frontHolder = qList.Dequeue();
             //tim dinh ke tiep : add 4 driction
-            print("count "+ qList.Count);
             foreach(Vector2 item in listDirection)
 			{
                 Vector2 newVector = frontHolder.GetPosition() + item;
-                print(newVector);
                 BallHolder newBallHolder = FindBallHolderByVectorPosition(newVector);
 
                 if (newBallHolder != null && newBallHolder.CanMoveOver()&&newBallHolder.GetParentNode()!=frontHolder)
 				{
                     int newCost = newBallHolder.CheckToInCreateCost(frontHolder);
-                    print("new cost " + newBallHolder.GetCost());
 
-                    //print(" new cost" + newCost +"cost: "+ cost);
                     if (newVector == to)
                     {
                         if (cost == 0)
@@ -166,15 +163,31 @@ public class GameManager : MonoBehaviour
                     }
 					if (cost==0 || newCost <= cost)
 					{
-                        print("add");
                         qList.Enqueue(newBallHolder);
 					}
                 }			
             }
             frontHolder.SetStatus(2);//set da di qua 4 diem
-
         }
-        return cost;
+		if (cost != 0)//co duong di
+		{
+			print("===================co duong di===============");
+
+			listPointLine = new List<Vector3>();
+			BallHolder pathding = FindBallHolderByVectorPosition(to);
+
+            do
+			{
+				Vector2 position = pathding.GetPosition();
+				listPointLine.Add(new Vector3(position.x, 0, position.y));
+				pathding = pathding.GetParentNode();
+			}
+			while (pathding.GetParentNode() != null);
+            Vector2 frontPosition = pathding.GetPosition();
+            listPointLine.Add(new Vector3(frontPosition.x, 0, frontPosition.y));
+        }
+        lineController.SetupLine(listPointLine);
+		return cost;
 	}
     //===================================Update==================================
     private void Update()
@@ -194,23 +207,38 @@ public class GameManager : MonoBehaviour
 
 			}
 		}
-		if (Input.GetMouseButtonUp(0))
+        if(isChoose == true && Input.GetMouseButton(0))
 		{
-            
+            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+            RaycastHit hit;
+            if (Physics.Raycast(ray, out hit, 100f))
+            {
+                if (hit.collider.tag == "BallHolder")
+                {
+                    BallHolder holder = hit.transform.GetComponent<BallHolder>();
+                    if (currentHolder == holder) return;
+                    currentHolder = holder;
+                    if (!currentHolder.CanHoldBall()) return;
+                    BFS(currentBall.currentBallHolder.GetPosition(), currentHolder.GetPosition());
+                    
+                }
+            }
+        }
+		if (Input.GetMouseButtonUp(0))
+		{           
 			Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 			RaycastHit hit;
 			if (Physics.Raycast(ray, out hit, 100f))
 			{
 				if (hit.collider.tag == "BallHolder")
 				{
-					print(hit.transform.name);
 					if (isChoose)
 					{
 						BallHolder holder = hit.transform.GetComponent<BallHolder>();
 						if (!holder.CanHoldBall()) return;
-                        print("co duong di khong : "+ BFS(currentBall.currentBallHolder.GetPosition(), holder.GetPosition()));
-
+                        print("co duong di khong : ");
                         currentBall.MoveBallFrom(holder, currentBall.currentBallHolder);
+                        lineController.ResetLine();
 					}
 				}
 			}
