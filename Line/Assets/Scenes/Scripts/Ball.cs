@@ -7,23 +7,13 @@ public class Ball : MonoBehaviour
 {
     [SerializeField] MeshRenderer mesh;
     [SerializeField] BallType type;
-    public BallHolder currentBallHolder;
-    public BallHolder fromBallHolder;
+
     public void InitData(BallType _type)
     {
         type = _type;
         SetColor(type);
     }
-    public void SetFromBallHolder(BallHolder _holder)
-	{
-        fromBallHolder = _holder;
-    }
-    public BallHolder GetFromBallHolder() => fromBallHolder;
-    public void SetCurrnetBallHolder(BallHolder _holder)
-    {
-        currentBallHolder = _holder;
-    }
-    public BallHolder GetCurrnetBallHolder() => currentBallHolder;
+
     public void SetColor(BallType type)
 	{
         mesh.material = GameData.Instance.materials[(int)type];
@@ -33,15 +23,14 @@ public class Ball : MonoBehaviour
 	{
         gameObject.transform.position = new Vector3(position.x, gameObject.transform.position.y, position.y);
 	}
+    public Vector2 GetPosition() => new Vector2(gameObject.transform.position.x, gameObject.transform.position.z);
     public BallType GetBallType() => type;
     public void MoveBallFrom(BallHolder currentBallHolder, BallHolder fromBallHolder = null)
 	{
-        
-        SetCurrnetBallHolder(currentBallHolder);
-        currentBallHolder.SetHoldBall();
+
+        currentBallHolder.SetCurrentBall(this);
         SetPosition(currentBallHolder.GetPosition());
         if (!fromBallHolder) return;
-        SetFromBallHolder(fromBallHolder);
         fromBallHolder.ReleaseBall();
     }
 }

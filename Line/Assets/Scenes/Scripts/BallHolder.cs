@@ -5,12 +5,17 @@ using UnityEngine;
 
 public class BallHolder : MonoBehaviour
 {
-    bool canHoldBall = true;
+    [SerializeField]Ball currentBall;
     [SerializeField] int x, y;
     [SerializeField] BallHolder parentHolder;//node truoc
     [SerializeField]int cost; // gia tri khi ball toi noi nay
     [SerializeField] int status; // status =0:chua di qua lan nao, status = 1: da di qua 1 lan: status = 2: da xet het 4 dinh ke
-    public void SetCanHoldBall(bool status) => canHoldBall = status;
+
+    public void SetCurrentBall(Ball _ball)
+	{
+        currentBall = _ball;
+    }
+    public Ball GetCurrentBall() => currentBall;
     public void SetStatus(int _status)
 	{
         status= _status;
@@ -18,7 +23,6 @@ public class BallHolder : MonoBehaviour
     public int CheckToInCreateCost(BallHolder parrentHolder)
 	{
         int value = parrentHolder.GetCost()+1;
-        print("value " + value);
         if (status == 0 )
 		{
             SetStatus(1);
@@ -36,7 +40,7 @@ public class BallHolder : MonoBehaviour
     public int GetCost() => cost;
     public void SetStartStatus()
     {
-        if (canHoldBall)
+        if (CanHoldBall())
         {
             cost = 0;
             status = 0;
@@ -51,7 +55,7 @@ public class BallHolder : MonoBehaviour
     public bool HasParentNode() => !(parentHolder == null);
     public bool CanMoveOver()
 	{
-        return status !=2 && canHoldBall;        
+        return status !=2 && CanHoldBall();        
 	}
     public void SetPosition(int _x, int _y)
     {
@@ -60,23 +64,24 @@ public class BallHolder : MonoBehaviour
         gameObject.transform.position = new Vector3(x, gameObject.transform.position.y, y);
     }
     public bool CanHoldBall() {
-        return canHoldBall;
+        return currentBall==null;
     } 
     public bool CanHoldBall(int x, int y) {
         if (this.x != x || this.y != y) return false;
-        return canHoldBall;
+        return CanHoldBall();
     }
     public Vector2 GetPosition()
 	{
         return new Vector2(x, y);
 	}
-    public void SetHoldBall()
-	{
-        canHoldBall = false;
-	}
+
 
     public void ReleaseBall()
 	{
-        SetCanHoldBall(true);
+        currentBall = null;
     }
+    public void DestroyBall()
+	{
+        Destroy(currentBall.gameObject);
+	}
 }

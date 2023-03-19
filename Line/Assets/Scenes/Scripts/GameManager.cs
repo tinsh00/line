@@ -26,8 +26,10 @@ public class GameManager : MonoBehaviour
     Ball currentBall;
     [SerializeField] LineController lineController;
     List<Vector3> listPointLine;
+    BallHolder startBallHolder;
     BallHolder currentHolder;
     List<Vector2> listDirection = new List<Vector2>() { new Vector2(1, 0), new Vector2(0, 1), new Vector2(-1, 0), new Vector2(0, -1) };
+    List<Vector2> listDirectionScore = new List<Vector2>() { new Vector2(1, 0), new Vector2(0, 1),  new Vector2(1, 1), new Vector2(-1,1) };
     // Start is called before the first frame update
     void Start()
     {
@@ -124,9 +126,49 @@ public class GameManager : MonoBehaviour
 	{
         return listBallHolder.Find(x => x.GetPosition() == vector);
 	}
+    public void CheckToGetScore()
+	{
+
+        List<BallHolder> balls = new List<BallHolder>();
+        balls.Add(currentHolder);
+        Vector2 fromVector = currentHolder.GetPosition();
+        BallType currentTypeBall = currentBall.GetBallType();
+        foreach(Vector2 dir in listDirectionScore)
+		{
+            List<BallHolder> listBallTemp = new List<BallHolder>();
+            Vector2 value1 = fromVector;
+            while (true)
+			{
+                value1 += dir;
+                BallHolder holder = FindBallHolderByVectorPosition(value1);
+                if (!holder) break;
+                Ball ball = holder.GetCurrentBall();
+                if(ball && ball.GetBallType() == currentTypeBall)
+                    listBallTemp.Add(holder);                   
+                else break;
+            }
+            value1 = fromVector;
+            while (true)
+			{
+                value1 -= dir;
+                BallHolder holder = FindBallHolderByVectorPosition(value1);
+                if (!holder) break;
+                Ball ball = holder.GetCurrentBall();
+                if (ball && ball.GetBallType() == currentTypeBall)
+                    listBallTemp.Add(holder);
+                else break;
+            }
+            if (listBallTemp.Count >= 4) balls.AddRange(listBallTemp);
+
+        }
+        if (balls.Count == 1) return;
+        foreach(BallHolder item in balls)
+		{
+            item.DestroyBall();
+		}
+	}
     int BFS(Vector2 from, Vector2 to)
 	{
-        print(from + " " + to);
         if (to == from) return 0;
         int cost = 0;
         Queue<BallHolder> qList = new Queue<BallHolder>();
@@ -136,10 +178,10 @@ public class GameManager : MonoBehaviour
             item.SetStartStatus();
 		}
         //start at vector from
-        BallHolder holder = FindBallHolderByVectorPosition(from);
-        holder.SetStatus(1);
+        startBallHolder = FindBallHolderByVectorPosition(from);
+        startBallHolder.SetStatus(1);
         //add in queue
-        qList.Enqueue(holder);
+        qList.Enqueue(startBallHolder);
 
         while (!(qList.Count == 0))
 		{ 
@@ -169,7 +211,7 @@ public class GameManager : MonoBehaviour
             }
             frontHolder.SetStatus(2);//set da di qua 4 diem
         }
-		if (cost != 0)//co duong di
+		if (cost != 0)//co duong di ++ add rule game
 		{
 			print("===================co duong di===============");
 
@@ -198,7 +240,6 @@ public class GameManager : MonoBehaviour
 			RaycastHit hit;
 			if (Physics.Raycast(ray, out hit, 100f))
 			{
-				print(hit.transform.name);
 				if (hit.collider.tag == "Ball")
 				{
 					currentBall = hit.transform.GetComponent<Ball>();
@@ -219,12 +260,12 @@ public class GameManager : MonoBehaviour
                     if (currentHolder == holder) return;
                     currentHolder = holder;
                     if (!currentHolder.CanHoldBall()) return;
-                    BFS(currentBall.currentBallHolder.GetPosition(), currentHolder.GetPosition());
+                   BFS(currentBall.GetPosition(), currentHolder.GetPosition());
                     
                 }
             }
         }
-		if (Input.GetMouseButtonUp(0))
+		if (isChoose && Input.GetMouseButtonUp(0))
 		{           
 			Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 			RaycastHit hit;
@@ -232,15 +273,12 @@ public class GameManager : MonoBehaviour
 			{
 				if (hit.collider.tag == "BallHolder")
 				{
-					if (isChoose)
-					{
-						BallHolder holder = hit.transform.GetComponent<BallHolder>();
-						if (!holder.CanHoldBall()) return;
-                        print("co duong di khong : ");
-                        currentBall.MoveBallFrom(holder, currentBall.currentBallHolder);
-                        lineController.ResetLine();
-					}
-				}
+                    BallHolder holder = hit.transform.GetComponent<BallHolder>();
+                    if (!holder.CanHoldBall()) return;
+                    currentBall.MoveBallFrom(holder, startBallHolder);
+                    lineController.ResetLine();
+                    CheckToGetScore();
+                }
 			}
             isChoose = false;
         }

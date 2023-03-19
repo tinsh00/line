@@ -12,6 +12,6 @@ public enum BallType
     Red,
     Green,
     Blue,
-    Pink,
-    Yellow
+    //Pink,
+    //Yellow
 }
