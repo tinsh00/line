@@ -6,12 +6,14 @@ using UnityEngine;
 public class BallHolder : MonoBehaviour
 {
     [SerializeField]Ball currentBall;
+    [SerializeField] ParticleSystem eff;
     [SerializeField] int x, y;
     [SerializeField] BallHolder parentHolder;//node truoc
     [SerializeField]int cost; // gia tri khi ball toi noi nay
     [SerializeField] int status; // status =0:chua di qua lan nao, status = 1: da di qua 1 lan: status = 2: da xet het 4 dinh ke
     [SerializeField] int amountTurn;
     [SerializeField] Vector2 fromDir = Vector2.zero;
+
     public Vector2 GetFromDir() => fromDir;
     public void SetCurrentBall(Ball _ball)
 	{
@@ -88,15 +90,12 @@ public class BallHolder : MonoBehaviour
     }
     public void DestroyBall()
 	{
+        eff.Play();
         Destroy(currentBall.gameObject);
 	}
 
     public bool CheckToIncreateAmountOfTurn(Vector2 currentDir,Vector2 parrentDir, Vector2 parrentPosition,int parrentAmount)
     {
-        //print("currentDir " + currentDir);
-        //print("parrentDir " + parrentDir);
-        //print("parrentPosition " + parrentPosition);
-        print("parrentAmount " + parrentAmount);
         if(fromDir==Vector2.zero && amountTurn==0)
         {
             if (parrentDir != null)
@@ -109,13 +108,14 @@ public class BallHolder : MonoBehaviour
                 fromDir = currentDir;
                 amountTurn = 1;
             }
-            return amountTurn<=4;
+            print("amount of Turn" + amountTurn);
+
+            return amountTurn <=4;
         }
         if (amountTurn < parrentAmount - 1) return false;
         fromDir = GetPosition() - parrentPosition;
-        print("from dir " + fromDir);
-        print("parrentDir " + parrentDir);
         amountTurn = fromDir == parrentDir ? parrentAmount : parrentAmount + 1;
+        print("amount of Turn" + amountTurn);
         return amountTurn <=4;
     }
 }
