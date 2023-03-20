@@ -11,7 +11,7 @@ public class BallHolder : MonoBehaviour
     [SerializeField] BallHolder parentHolder;//node truoc
     [SerializeField]int cost; // gia tri khi ball toi noi nay
     [SerializeField] int status; // status =0:chua di qua lan nao, status = 1: da di qua 1 lan: status = 2: da xet het 4 dinh ke
-    [SerializeField] int amountTurn;
+    [SerializeField] int amountTurn=0;
     [SerializeField] Vector2 fromDir = Vector2.zero;
 
     public Vector2 GetFromDir() => fromDir;
@@ -24,35 +24,52 @@ public class BallHolder : MonoBehaviour
 	{
         status= _status;
     }
-    public int CheckToInCreateCost(BallHolder parrentHolder)
+    public int CheckToInCreateCost(BallHolder parrentHolder,Vector2 currentDir)
 	{
-        int value = parrentHolder.GetCost()+1;
-        if (status == 0 )
-		{
+        int value = parrentHolder.GetCost() + 1;
+
+        int parrentAmountTurn = parrentHolder.GetAmountOfTurn();
+        Vector2 parrentFromDir = parrentHolder.GetFromDir();
+        Vector2 parrentPosition = parrentHolder.GetPosition();
+        if (status == 0)//chua di qua lan nao => gan luon
+        {
+            
+            if (parrentFromDir == Vector2.zero && parrentAmountTurn == 0)
+            {
+                fromDir = currentDir;
+                amountTurn = 0;
+            }
+            fromDir = GetPosition() - parrentPosition;
+            amountTurn = fromDir == parrentFromDir ? parrentAmountTurn : parrentAmountTurn + 1;
             SetStatus(1);
             cost = value;
             SetParentNode(parrentHolder);
             return cost;
-		}
-        if(cost < value)
-		{
+        }
+        //da di qua => da co cost va amountOfTurn
+        if (amountTurn < parrentAmountTurn)
+        {
             return cost;
         }
-        SetParentNode(parrentHolder);
-        return cost = value;
+        fromDir = GetPosition() - parrentPosition;
+        amountTurn = fromDir == parrentFromDir ? parrentAmountTurn : parrentAmountTurn + 1;
+        print("amount Turn " + amountTurn);
+        if (amountTurn < 4)
+        {
+            SetParentNode(parrentHolder);
+            return cost = value;
+        }
+        else return -1;
+
     }
     public int GetCost() => cost;
     public int GetAmountOfTurn() => amountTurn;
     public void SetStartStatus()
     {
-        if (CanHoldBall())
-        {
-            cost = 0;
-            status = 0;
-            amountTurn = 0;
-            fromDir = Vector2.zero;
-        };
-
+        cost = 0;
+        status = 0;
+        amountTurn = 0;
+        fromDir = Vector2.zero;
         parentHolder = null;
     }
     public void SetParentNode(BallHolder _parentHolder)
@@ -94,28 +111,25 @@ public class BallHolder : MonoBehaviour
         Destroy(currentBall.gameObject);
 	}
 
-    public bool CheckToIncreateAmountOfTurn(Vector2 currentDir,Vector2 parrentDir, Vector2 parrentPosition,int parrentAmount)
+    public int CheckToIncreateAmountOfTurn(BallHolder fromBallHolder,Vector2 currentDir)//Vector2 currentDir,Vector2 parrentFromDir, Vector2 parrentPosition,int parrentAmount)
     {
-        if(fromDir==Vector2.zero && amountTurn==0)
-        {
-            if (parrentDir != null)
-            {
-                fromDir = parrentDir;
-                amountTurn = parrentAmount;
-            }
-            else
+        int parrentAmountTurn = fromBallHolder.GetAmountOfTurn();
+        Vector2 parrentFromDir = fromBallHolder.GetFromDir();
+        Vector2 parrentPosition = fromBallHolder.GetPosition();
+		if (status == 0)
+		{
+            if (parrentFromDir == Vector2.zero && parrentAmountTurn == 0)
             {
                 fromDir = currentDir;
-                amountTurn = 1;
+                return amountTurn = 0;              
             }
-            print("amount of Turn" + amountTurn);
-
-            return amountTurn <=4;
         }
-        if (amountTurn < parrentAmount - 1) return false;
+		if (amountTurn < parrentAmountTurn)
+		{
+            return amountTurn;
+		}
         fromDir = GetPosition() - parrentPosition;
-        amountTurn = fromDir == parrentDir ? parrentAmount : parrentAmount + 1;
-        print("amount of Turn" + amountTurn);
-        return amountTurn <=4;
+        amountTurn = fromDir == parrentFromDir ? parrentAmountTurn : parrentAmountTurn + 1;       
+        return amountTurn;
     }
 }

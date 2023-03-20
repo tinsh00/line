@@ -162,7 +162,8 @@ public class GameManager : MonoBehaviour
 
         }
         if (balls.Count == 1) return;
-        foreach(BallHolder item in balls)
+        //UIManager.UpdateYourScore
+        foreach (BallHolder item in balls)
 		{
             item.DestroyBall();
 		}
@@ -191,11 +192,10 @@ public class GameManager : MonoBehaviour
 			{
                 Vector2 newVector = fromHolder.GetPosition() + item;
                 BallHolder newBallHolder = FindBallHolderByVectorPosition(newVector);
-                if (newBallHolder != null && newBallHolder.CanMoveOver()&&newBallHolder.GetParentNode()!=fromHolder )
+                if (newBallHolder != null && newBallHolder.CanMoveOver()&& newBallHolder.GetParentNode()!=fromHolder)
 				{
-                    bool canTurn =  newBallHolder.CheckToIncreateAmountOfTurn(item,fromHolder.GetFromDir(), fromHolder.GetPosition(),fromHolder.GetAmountOfTurn());
-                    int newCost = newBallHolder.CheckToInCreateCost(fromHolder);
-                    if (!canTurn) continue;
+                    int newCost = newBallHolder.CheckToInCreateCost(fromHolder, item);
+                    if (newCost == -1) continue;
                     if (newVector == to)
                     {
                         if (cost == 0)
@@ -228,6 +228,7 @@ public class GameManager : MonoBehaviour
             Vector2 frontPosition = pathding.GetPosition();
             listPointLine.Add(new Vector3(frontPosition.x, 0, frontPosition.y));
         }
+        listPointLine.Reverse();
         lineController.SetupLine(listPointLine);
 		return cost;
 	}
@@ -274,9 +275,9 @@ public class GameManager : MonoBehaviour
 				if (hit.collider.tag == "BallHolder")
 				{
                     BallHolder holder = hit.transform.GetComponent<BallHolder>();
-                    if (!holder.CanHoldBall()) return;
-                    currentBall.MoveBallFrom(holder, startBallHolder);
                     lineController.ResetLine();
+                    if (!holder.CanHoldBall() || holder.GetAmountOfTurn()>4) return;
+                    currentBall.MoveBallFrom(holder, startBallHolder);
                     CheckToGetScore();
                 }
 			}

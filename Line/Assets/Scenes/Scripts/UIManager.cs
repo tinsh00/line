@@ -21,15 +21,17 @@ public class UIManager : MonoBehaviour
     }
     public void UpdateYourScore(float _score)
     {
-        score.text = String.Format("{0,6:000000}", _score) ;
+        currentScore += _score;
+        if (currentScore > highScore) UpdateHighScore(currentScore);
+        score.text = String.Format("{0,6:000000}", currentScore) ;
     }
     public void UpdateHighScore(float _highScore)
     {
         highScoreTxt.text = String.Format("{0,6:000000}", _highScore);
     }
-    public void SetSaveHighScore(float value)
+    public void SetSaveHighScore()
     {
-        if (value <= highScore) return;
-        PlayerPrefs.SetFloat(HIGHSCORE, value);
+        if (currentScore <= highScore) return;
+        PlayerPrefs.SetFloat(HIGHSCORE, currentScore);
     }
 }
