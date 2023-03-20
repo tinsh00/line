@@ -13,7 +13,7 @@ public class LineController : MonoBehaviour
 	}
 
 	public void SetupLine(List<Vector3> list)
-	{		
+	{
 		lr.positionCount = list.Count;
 		int i = 0;
 		foreach(Vector3 item in list)

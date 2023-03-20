@@ -185,17 +185,17 @@ public class GameManager : MonoBehaviour
 
         while (!(qList.Count == 0))
 		{ 
-            BallHolder frontHolder = qList.Dequeue();
+            BallHolder fromHolder = qList.Dequeue();
             //tim dinh ke tiep : add 4 driction
             foreach(Vector2 item in listDirection)
 			{
-                Vector2 newVector = frontHolder.GetPosition() + item;
+                Vector2 newVector = fromHolder.GetPosition() + item;
                 BallHolder newBallHolder = FindBallHolderByVectorPosition(newVector);
-
-                if (newBallHolder != null && newBallHolder.CanMoveOver()&&newBallHolder.GetParentNode()!=frontHolder)
+                if (newBallHolder != null && newBallHolder.CanMoveOver()&&newBallHolder.GetParentNode()!=fromHolder )
 				{
-                    int newCost = newBallHolder.CheckToInCreateCost(frontHolder);
-
+                    bool canTurn =  newBallHolder.CheckToIncreateAmountOfTurn(item,fromHolder.GetFromDir(), fromHolder.GetPosition(),fromHolder.GetAmountOfTurn());
+                    int newCost = newBallHolder.CheckToInCreateCost(fromHolder);
+                    if (!canTurn) continue;
                     if (newVector == to)
                     {
                         if (cost == 0)
@@ -209,11 +209,11 @@ public class GameManager : MonoBehaviour
 					}
                 }			
             }
-            frontHolder.SetStatus(2);//set da di qua 4 diem
+            fromHolder.SetStatus(2);//set da di qua 4 diem
         }
 		if (cost != 0)//co duong di ++ add rule game
 		{
-			print("===================co duong di===============");
+			print("===================co duong di==============="+ cost);
 
 			listPointLine = new List<Vector3>();
 			BallHolder pathding = FindBallHolderByVectorPosition(to);
